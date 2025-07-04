@@ -29,7 +29,6 @@ QDF Patrol Companion is a companion Python application for Roblox QDF operatives
 - ✅ **Log Parsing**: Reads Roblox logs via F9 system to extract RPC and DMR data.
 - 🔥 **Live Temperature Tracking**: Displays live temperature updates and uses visual color cues.
 - ⏳ **Integrity Estimation**: Calculates and predicts reactor integ degradation rate over time.
-- 💥 **Code Black Simulation**: Triggers meltdown simulation when thresholds are met.
 - 🔊 **Music Integration**: Plays custom music during meltdown phases.
 - 🛑 **Antitamper & Authentication**: Prevents script use by unauthorized users.
 - 🧪 **Debug Mode**: Enables experimental features for developers.
