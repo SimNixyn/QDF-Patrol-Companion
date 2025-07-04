@@ -1,7 +1,6 @@
 win10toast
 requests
 pyaudio
-playsound
 pygame
 numpy
 pydub
