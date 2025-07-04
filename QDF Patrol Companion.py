@@ -6,7 +6,7 @@
 #  ╚══▀▀═╝ ╚═════╝ ╚═╝         ╚═╝     ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚══════╝     ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝     ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝
 # QDF Patrol Companion
 # Developed by simplynixyn
-version = "0.3.1 Alpha"
+version = "0.3.2 Alpha"
 # This script is designed to monitor DMR temperature and status from Roblox logs.
 # It will notify the user of temperature changes and status updates.
 # It also includes a debug mode for additional experimental features, and additional logging.
@@ -48,7 +48,7 @@ try:
     import json
     import re
     import tkinter as tk
-    from tkinter import Tk, PhotoImage
+    from tkinter import PhotoImage
     from threading import Thread
     from win10toast import ToastNotifier
     import colorsys
@@ -58,9 +58,7 @@ try:
     import threading
     import time
     from pathlib import Path
-    from playsound import playsound
     import pygame
-    import ctypes
     import numpy as np
     from pathlib import Path
     import os
@@ -75,6 +73,7 @@ try:
     import zipfile
     import shutil
     from io import BytesIO
+    import pygetwindow as gw
     print("Loaded Imports")
 except:
     print("One or more imports failed to load!")
@@ -91,9 +90,9 @@ rbxuserid = None # DO NOT CHANGE THIS, it is used to store the Roblox user ID af
 rbxusername = None # DO NOT CHANGE THIS, it is used to store the Roblox username after fetching it.
 
 # Settings
-debug_mode = False  # Set to True for debug mode, which enables additional features, such as debug commands.
+debug_mode = True  # Set to True for debug mode, which enables additional features, such as debug commands.
 music = False # Set to True to enable music playback during events.
-master = False # prevents automatic updates from github, set to True if you wish to suppress automatic updates.
+master = True # prevents automatic updates from github, set to True if you wish to suppress automatic updates.
 
 # Integrity degradation rates (seconds per 1% loss)
 DEGRADATION_RATES = {
@@ -171,7 +170,7 @@ def extract_userid_from_logs():
             continue
     return None
 
-import requests as __;import base64 as ___;import json as ____;import operator as _____
+import requests as __;import base64 as ___;import operator as _____
 def __O0O0OO(_):
  try:
   __O="".join([chr(c) for c in [104,116,116,112,115,58,47,47,103,114,111,117,112,115,46,114,111,98,108,111,120,46,99,111,109,47,118,49,47,117,115,101,114,115,47]])+str(_)+"/groups/roles"
@@ -328,6 +327,41 @@ class DMRTempGUI:
 
         self.animate_idle_state()
 
+    def reset(self):
+        """Reset the GUI state"""
+        self.last_temp = None
+        self.last_temp_int = None
+        self.last_notification = None
+        self.cycles_since_last_notify = 0
+        self.last_time = None
+        self.received_data = False
+        self.current_status = None
+        self.estimated_status = None
+        self.integ = 100
+        self.is_estimating = False
+        self.estimation_job = None
+        self.latest_known_temp = None
+        self.last_known_time = None
+        self.rate_of_change = 0
+        self.last_estimate_time = None
+
+        self.current_integrity = 100.0
+        if self.integrity_timer:
+            self.root.after_cancel(self.integrity_timer)
+            self.integrity_timer = None
+        if self.meltdown_countdown:
+            self.root.after_cancel(self.meltdown_countdown)
+            self.meltdown_countdown = None
+
+        self.degradation_active = False
+        self.code_black_triggered = False
+        self.current_rate = None
+        self.last_rate_update = None
+        self.rate_transition_factor = 0.0
+
+        self.temp_time_data.clear()
+
+
     def animate_idle_state(self):
         if not self.received_data:
             self.rainbow_hue = (self.rainbow_hue + 0.007) % 1.0
@@ -450,6 +484,7 @@ class DMRTempGUI:
         self.degradation_active = False
         self.code_black_triggered = True
         self.estimated_status = "In Code Black"
+        threading.Timer(720, self.reset).start()
         self.start_meltdown_countdown()
             
     def stop_integrity_degradation(self):
@@ -644,6 +679,8 @@ rbxusername = get_roblox_username(rbxuserid) if rbxuserid else "Unknown User"
 
 print(f"Roblox User ID: {rbxuserid}")
 print(f"Roblox Username: {rbxusername}")
+import pygetwindow as gw
+
 
 if __name__ == "__main__": # Main entry point
     try:
