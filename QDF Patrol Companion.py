@@ -48,6 +48,9 @@ try:
     import random
     import random, time, threading
     import sys
+    import zipfile
+    import shutil
+    from io import BytesIO
     print("Loaded Imports")
 except:
     print("One or more imports failed to load!")
@@ -66,7 +69,7 @@ rbxusername = None # DO NOT CHANGE THIS, it is used to store the Roblox username
 # Settings
 debug_mode = True  # Set to True for debug mode, which enables additional features, such as debug commands.
 music = True # Set to True to enable music playback during events.
-master = True # prevents automatic updates from github, set to True if you wish to suppress automatic updates.
+master = False # prevents automatic updates from github, set to True if you wish to suppress automatic updates.
 
 # Integrity degradation rates (seconds per 1% loss)
 DEGRADATION_RATES = {
@@ -93,28 +96,32 @@ thresholds = {
 
 print("Loaded Config")
 
-# --- GitHub Version Check ---
+# --- Version Check ---
 def check_github_version():
     try:
-        github_raw_url = "https://raw.githubusercontent.com/simplynixyn/QDF-Patrol-Companion/main/QDF%20Patrol%20Companion.py"
+        github_raw_url = "https://raw.githubusercontent.com/SimNixyn/QDF-Patrol-Companion/refs/heads/main/QDF%20Patrol%20Companion.py"
         resp = requests.get(github_raw_url, timeout=5)
         if resp.status_code == 200:
-            for line in resp.text.splitlines():
-                if line.strip().startswith("version"):
-                    github_version = line.split("=", 1)[1].strip().strip('"').strip("'")
-                    if github_version != version:
-                        print(f"[UPDATE] Your script version ({version}) is not up to date! Latest: {github_version}")
-                    else:
-                        print("[INFO] Script is up to date with GitHub.")
-                    break
+            # Search for the version assignment anywhere in the file
+            match = re.search(r'version\s*=\s*["\']([^"\']+)["\']', resp.text)
+            if match:
+                github_version = match.group(1)
+                # Extract numeric part for comparison (e.g., "0.2 alpha" -> 0.2)
+                def extract_number(ver):
+                    m = re.match(r"(\d+(?:\.\d+)?)", ver)
+                    return float(m.group(1)) if m else 0
+                local_num = extract_number(version)
+                remote_num = extract_number(github_version)
+                if remote_num > local_num:
+                    return False, f"The script version ({version}) is not up to date! Latest: {github_version}"
+                else:
+                    return True, "Script is up to date!"
+            else:
+                return False, "Could not find version info in GitHub file."
         else:
-            print("[WARN] Could not fetch latest version info from GitHub.")
+            return False, "Could not fetch latest version info from GitHub."
     except Exception as e:
-        print(f"[WARN] Version check failed: {e}")
-
-if not master:
-    check_github_version()
-# --- End GitHub Version Check ---
+        return False, f"Version check failed: {e}"
 
 # --- Utility Functions ---
 
@@ -492,7 +499,7 @@ class DMRTempGUI: # GUI class to display DMR temperature and status
 
             def TrackOne():
                 def switch_track():
-                    if self.current_status in ("In Code Black", "In Code Omni"):
+                    if self.current_status in ("In Code Black"):
                         player.stop()
                         player.play(script_dir / "Music" / "Meltdown" / "The Classic" / "Breach.mp3")
                 player.play(script_dir / "Music" / "Meltdown" / "The Classic" / "Resonance.mp3")
@@ -500,7 +507,7 @@ class DMRTempGUI: # GUI class to display DMR temperature and status
 
             def TrackTwo():
                 def switch_track():
-                    if self.current_status in ("In Code Black", "In Code Omni"):
+                    if self.current_status in ("In Code Black"):
                         player.stop()
                         player.play(script_dir / "Music" / "Meltdown" / "INTENCE VIBES" / "FinalCountdown.mp3")
                 player.play(script_dir / "Music" / "Meltdown" / "INTENCE VIBES" / "TakeOnMe.mp3")
@@ -508,7 +515,7 @@ class DMRTempGUI: # GUI class to display DMR temperature and status
 
             def TrackThree():
                 def switch_track():
-                    if self.current_status in ("In Code Black", "In Code Omni"):
+                    if self.current_status in ("In Code Black"):
                         player.stop()
                         player.play(script_dir / "Music" / "Meltdown" / "Smth Else" / "MyWay.mp3")
                 player.play(script_dir / "Music" / "Meltdown" / "Smth Else" / "Dont Stop Believing.mp3")
@@ -520,7 +527,7 @@ class DMRTempGUI: # GUI class to display DMR temperature and status
             else:                    TrackThree()
     # ----------------------------------------------------------------
 
-        if self.current_status == "In Code Black" or self.estimated_status == "In Code Black":
+        if self.current_status == "In Code Black":
             meltdownOSTChoose()
 
     def start_estimation(self):
@@ -650,6 +657,55 @@ if __name__ == "__main__": # Main entry point of the script
             print(f"Welcome {rbxusername}! (User ID: {rbxuserid})")
             if debug_mode == True:
                 print("Debug Mode Enabled! Additional features are available.")
+            if master == False:
+                up_to_date, msg = check_github_version()
+                if not up_to_date:
+                    print(msg)
+                    print("[UPDATE] Downloading latest version from GitHub...")
+                    try:
+
+                        # Download the latest repo as a zip
+                        github_zip_url = "https://github.com/SimNixyn/QDF-Patrol-Companion/archive/refs/heads/main.zip"
+                        print("[UPDATE] Downloading latest repository from GitHub...")
+                        resp = requests.get(github_zip_url, timeout=30)
+                        if resp.status_code == 200:
+                            # Extract zip to a temp directory
+                            with zipfile.ZipFile(BytesIO(resp.content)) as zf:
+                                temp_extract_dir = script_dir / "__qdf_update_tmp"
+                                if temp_extract_dir.exists():
+                                    shutil.rmtree(temp_extract_dir)
+                                zf.extractall(temp_extract_dir)
+                                repo_root = next(temp_extract_dir.iterdir())
+                                # Remove everything in current script directory except the temp dir itself
+                                for item in script_dir.iterdir():
+                                    if item.name == "__qdf_update_tmp":
+                                        continue
+                                    if item.is_dir():
+                                        shutil.rmtree(item)
+                                    else:
+                                        item.unlink()
+                                # Move all files from repo_root to script_dir
+                                for src in repo_root.iterdir():
+                                    dest = script_dir / src.name
+                                    if src.is_dir():
+                                        shutil.copytree(src, dest)
+                                    else:
+                                        shutil.copy2(src, dest)
+                                shutil.rmtree(temp_extract_dir)
+                            print("[UPDATE] Repository updated successfully. Restarting...")
+                            python = sys.executable
+                            os.execl(python, python, *sys.argv)
+                        else:
+                            print("[ERROR] Failed to download latest repository from GitHub.")
+                            print(f"HTTP status: {resp.status_code}")
+                            input("Press Enter to exit.")
+                            exit(1)
+                    except Exception as e:
+                        print(f"[ERROR] Update failed: {e}")
+                        input("Press Enter to exit.")
+                        exit(1)
+                else:
+                    print(msg)
             print("\n")
             root = tk.Tk()
             gui = DMRTempGUI(root)
