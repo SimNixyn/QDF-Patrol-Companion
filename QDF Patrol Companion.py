@@ -6,12 +6,12 @@
 #  ╚══▀▀═╝ ╚═════╝ ╚═╝         ╚═╝     ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚══════╝     ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝     ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝
 # QDF Patrol Companion
 # Developed by simplynixyn
-version = "0.3 alpha"
+version = "0.3.1 Alpha"
 # This script is designed to monitor DMR temperature and status from Roblox logs.
 # It will notify the user of temperature changes and status updates.
-# It also includes a debug mode for additional expremimental features, and additional logging.
+# It also includes a debug mode for additional experimental features, and additional logging.
 # =====================================
-# NOITCE!!! This script uses antitamper techniques to prevent unauthorized access and use.
+# NOTICE!!! This script uses antitamper techniques to prevent unauthorized access and use.
 # Thus meaning, if you are not within the QDF Roblox group, you will not be able to run this script.
 
 def ensure_requirements_installed():
