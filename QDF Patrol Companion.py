@@ -6,7 +6,7 @@
 #  ╚══▀▀═╝ ╚═════╝ ╚═╝         ╚═╝     ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚══════╝     ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝     ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝
 # QDF Patrol Companion
 # Developed by simplynixyn
-version = "0.3.2 Alpha"
+version = "0.4 Alpha"
 # This script is designed to monitor DMR temperature and status from Roblox logs.
 # It will notify the user of temperature changes and status updates.
 # It also includes a debug mode for additional experimental features, and additional logging.
