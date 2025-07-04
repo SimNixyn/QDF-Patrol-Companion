@@ -6,7 +6,7 @@
 #  ╚══▀▀═╝ ╚═════╝ ╚═╝         ╚═╝     ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚══════╝     ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝     ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝
 # QDF Patrol Companion
 # Developed by simplynixyn
-version = "0.2 alpha"
+version = "0.3 alpha"
 # This script is designed to monitor DMR temperature and status from Roblox logs.
 # It will notify the user of temperature changes and status updates.
 # It also includes a debug mode for additional expremimental features, and additional logging.
@@ -499,26 +499,26 @@ class DMRTempGUI: # GUI class to display DMR temperature and status
 
             def TrackOne():
                 def switch_track():
-                    if self.current_status in ("In Code Black"):
+                    if self.current_status in ("In Code Omni", "In Code Black"):
                         player.stop()
-                        player.play(script_dir / "Music" / "Meltdown" / "The Classic" / "Breach.mp3")
-                player.play(script_dir / "Music" / "Meltdown" / "The Classic" / "Resonance.mp3")
+                        player.play(script_dir / "Breach.mp3")
+                player.play(script_dir / "Resonance.mp3")
                 threading.Timer(267, switch_track).start()
 
             def TrackTwo():
                 def switch_track():
-                    if self.current_status in ("In Code Black"):
+                    if self.current_status in ("In Code Omni", "In Code Black"):
                         player.stop()
-                        player.play(script_dir / "Music" / "Meltdown" / "INTENCE VIBES" / "FinalCountdown.mp3")
-                player.play(script_dir / "Music" / "Meltdown" / "INTENCE VIBES" / "TakeOnMe.mp3")
+                        player.play(script_dir / "FinalCountdown.mp3")
+                player.play(script_dir / "TakeOnMe.mp3")
                 threading.Timer(267, switch_track).start()
 
             def TrackThree():
                 def switch_track():
-                    if self.current_status in ("In Code Black"):
+                    if self.current_status in ("In Code Omni", "In Code Black"):
                         player.stop()
-                        player.play(script_dir / "Music" / "Meltdown" / "Smth Else" / "MyWay.mp3")
-                player.play(script_dir / "Music" / "Meltdown" / "Smth Else" / "Dont Stop Believing.mp3")
+                        player.play(script_dir / "MyWay.mp3")
+                player.play(script_dir / "Dont Stop Believing.mp3")
                 threading.Timer(267, switch_track).start()
 
             # Pick the track set
@@ -660,7 +660,6 @@ if __name__ == "__main__": # Main entry point of the script
             if master == False:
                 up_to_date, msg = check_github_version()
                 if not up_to_date:
-                    print(msg)
                     print("[UPDATE] Downloading latest version from GitHub...")
                     try:
 
@@ -705,7 +704,7 @@ if __name__ == "__main__": # Main entry point of the script
                         input("Press Enter to exit.")
                         exit(1)
                 else:
-                    print(msg)
+                    pass
             print("\n")
             root = tk.Tk()
             gui = DMRTempGUI(root)
