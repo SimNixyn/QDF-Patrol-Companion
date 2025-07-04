@@ -8,7 +8,7 @@ Permission is hereby granted to **verified members of the Roblox QDF group only*
 - Any modification of the anti-tampering or group verification logic is strictly prohibited.
 - You **may not** sell, rent, sublicense, or otherwise profit from this software.
 - You are allowed to fork or modify the code for personal use **only if you remain in QDF**.
-- Any violation will result in immediate revocation of rights and may lead to Roblox moderation.
+- Any violation will result in immediate revocation of rights.
 
 ## Disclaimer:
 THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.
