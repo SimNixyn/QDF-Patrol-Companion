@@ -14,9 +14,33 @@ version = "0.3 alpha"
 # NOITCE!!! This script uses antitamper techniques to prevent unauthorized access and use.
 # Thus meaning, if you are not within the QDF Roblox group, you will not be able to run this script.
 
+def ensure_requirements_installed():
+    import subprocess
+    import sys
+    from pathlib import Path
+    import importlib.metadata as importlib_metadata
+
+    req_path = Path(__file__).parent / "requirements.txt"
+    if req_path.exists():
+        with open(req_path) as f:
+            required = [line.strip() for line in f if line.strip() and not line.startswith("#")]
+        installed = {dist.metadata['Name'].lower() for dist in importlib_metadata.distributions()}
+        to_install = []
+        for req in required:
+            pkg_name = req.split("==")[0].lower() if "==" in req else req.lower()
+            if pkg_name not in installed:
+                to_install.append(req)
+        if to_install:
+            try:
+                subprocess.check_call([sys.executable, "-m", "pip", "install", *to_install])
+            except Exception as e:
+                print(f"[WARN] Failed to install requirements: {e}")
+
+ensure_requirements_installed()
 
 print("Starting QDF Patrol Companion...")
 print("Loading Imports...")
+
 try:
     import os
     import time
@@ -67,8 +91,8 @@ rbxuserid = None # DO NOT CHANGE THIS, it is used to store the Roblox user ID af
 rbxusername = None # DO NOT CHANGE THIS, it is used to store the Roblox username after fetching it.
 
 # Settings
-debug_mode = True  # Set to True for debug mode, which enables additional features, such as debug commands.
-music = True # Set to True to enable music playback during events.
+debug_mode = False  # Set to True for debug mode, which enables additional features, such as debug commands.
+music = False # Set to True to enable music playback during events.
 master = False # prevents automatic updates from github, set to True if you wish to suppress automatic updates.
 
 # Integrity degradation rates (seconds per 1% loss)
@@ -96,7 +120,8 @@ thresholds = {
 
 print("Loaded Config")
 
-# --- Version Check ---
+# --- Utility Functions ---
+
 def check_github_version():
     try:
         github_raw_url = "https://raw.githubusercontent.com/SimNixyn/QDF-Patrol-Companion/refs/heads/main/QDF%20Patrol%20Companion.py"
@@ -122,8 +147,6 @@ def check_github_version():
             return False, "Could not fetch latest version info from GitHub."
     except Exception as e:
         return False, f"Version check failed: {e}"
-
-# --- Utility Functions ---
 
 def debugprint(*args, **kwargs):
     if debug_mode:
@@ -182,12 +205,8 @@ def play_loud_square_wave(duration=5, freq=440, rate=44100):
         stream.close()
         p.terminate()
 
-def debugcheck(): # Checks if debug mode is enabled
-    if debug_mode == True:
-        return True
-    if debug_mode == False:
-        return False
-    return False
+def debugcheck():
+    return debug_mode
 
 def launch_deterrent():
     sound_thread = Thread(target=play_loud_square_wave, args=(5,), daemon=True)
@@ -212,7 +231,7 @@ def launch_deterrent():
 
 print("Loaded Utility Functions")
 
-def get_color_for_temp(temp_int): # Returns a color based on the temperature value
+def get_color_for_temp(temp_int):
     if temp_int <= 999:
         return "#00eaff"
     elif temp_int <= 2499:
@@ -224,7 +243,7 @@ def get_color_for_temp(temp_int): # Returns a color based on the temperature val
     else:
         return "#FF0000"
     
-class MusicPlayer: # Music player class to handle music playback
+class MusicPlayer:
     def __init__(self):
         pygame.mixer.init()
         self.volume = 0.27  # Default volume (0.0 to 1.0)
@@ -247,7 +266,7 @@ class MusicPlayer: # Music player class to handle music playback
         pygame.mixer.music.stop()
     
     def set_volume(self, volume):
-        self.volume = max(0.0, min(1.0, volume))  # Clamp between 0 and 1
+        self.volume = max(0.0, min(1.0, volume))
         pygame.mixer.music.set_volume(self.volume)
     
     def get_volume(self):
@@ -259,7 +278,7 @@ class MusicPlayer: # Music player class to handle music playback
         return pygame.mixer.music.get_busy()
 player = MusicPlayer()
 
-class DMRTempGUI: # GUI class to display DMR temperature and status
+class DMRTempGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("Roblox [QDF Patrol Companion]")
@@ -293,7 +312,6 @@ class DMRTempGUI: # GUI class to display DMR temperature and status
         self.rate_of_change = 0
         self.last_estimate_time = None
 
-        # Integrity simulation attributes
         self.current_integrity = 100.0
         self.integrity_timer = None
         self.meltdown_countdown = None
@@ -346,7 +364,6 @@ class DMRTempGUI: # GUI class to display DMR temperature and status
                 self.last_known_time = current_time
                 self.latest_known_temp = temp_int
                 
-        # Handle integrity simulation
         if temp_int >= 3500:
             self.start_integrity_degradation(temp_int)
         elif temp_int < 3500 and self.degradation_active:
@@ -369,7 +386,7 @@ class DMRTempGUI: # GUI class to display DMR temperature and status
         for (min_temp, max_temp), rate in DEGRADATION_RATES.items():
             if min_temp <= temp <= max_temp:
                 return rate
-        return DEGRADATION_RATES[(5000, float('inf'))]  # Default to fastest rate
+        return DEGRADATION_RATES[(5000, float('inf'))]
 
     def start_integrity_degradation(self, current_temp):
         """Start or update integrity degradation simulation"""
@@ -390,18 +407,15 @@ class DMRTempGUI: # GUI class to display DMR temperature and status
             self.update_integrity_eta()
             return
             
-        # If rate changed, begin smooth transition
         if new_rate != self.current_rate:
             time_since_last_update = now - self.last_rate_update
             transition_speed = 0.5 
             self.rate_transition_factor = min(1.0, self.rate_transition_factor + (time_since_last_update * transition_speed))
             
-            # Calculate weighted rate during transition
             self.current_rate = (self.current_rate * (1 - self.rate_transition_factor) + 
                                new_rate * self.rate_transition_factor)
             self.last_rate_update = now
             
-            # Reset transition if we're close to target rate
             if abs(new_rate - self.current_rate) < 0.1:
                 self.current_rate = new_rate
                 self.rate_transition_factor = 0.0
@@ -418,18 +432,15 @@ class DMRTempGUI: # GUI class to display DMR temperature and status
         self.current_integrity = max(9.0, self.current_integrity - integrity_lost)
         self.last_degradation_time = now
         
-        # Update display
         if self.current_integrity > 9.0:
             percent_remaining = self.current_integrity - 9.0
             seconds_remaining = percent_remaining * self.current_rate
             
-            # Format time with milliseconds for smoother display
             mins = int(seconds_remaining // 60)
             secs = int(seconds_remaining % 60)
             millis = int((seconds_remaining % 1) * 1000)
             self.update_status(f"ETA Meltdown: {mins:02d}:{secs:02d}.{millis:03d}")
             
-            # Schedule next update
             self.integrity_timer = self.root.after(50, self.update_integrity_eta)
         else:
             self.trigger_code_black()
@@ -448,7 +459,7 @@ class DMRTempGUI: # GUI class to display DMR temperature and status
         self.update_status(self.current_status or "Status: Unknown")
         
     def start_meltdown_countdown(self):
-        self.meltdown_countdown = 649  # 10 minutes 49 seconds in seconds
+        self.meltdown_countdown = 649
         self.update_meltdown_countdown()
         
     def update_meltdown_countdown(self):
@@ -474,7 +485,6 @@ class DMRTempGUI: # GUI class to display DMR temperature and status
         status_text = status.replace("DMR ", "").title()
         self.current_status = status_text
         
-        # Handle DMR Offline to restart script
         if status_text.lower() == "offline" and self.code_black_triggered:
             self.restart_script()
             
@@ -571,23 +581,23 @@ class DMRTempGUI: # GUI class to display DMR temperature and status
 
 print("Loaded DMR Logic")
 
-def get_latest_log_file(): # Returns the most recent log file from the Roblox logs directory
+def get_latest_log_file():
     logs = glob.glob(os.path.join(log_dir, "*.log"))
     return max(logs, key=os.path.getmtime) if logs else None
 
-def extract_temp(details): # Extracts the temperature from the details string
+def extract_temp(details):
     m = temp_pattern.search(details)
     if m:
         return m.group(1) + "K", int(m.group(1))
     return None, None
 
-def extract_status(details): # Extracts the DMR status from the details string
+def extract_status(details):
     m = status_pattern.search(details)
     if m:
         return f"DMR {m.group(1).lower()}"
     return None
 
-def parse_bloxstrap_log(line, gui): # Parses data from the Bloxstrap log file
+def parse_bloxstrap_log(line, gui):
     try:
         status = extract_status(line)
         if status:
@@ -603,7 +613,7 @@ def parse_bloxstrap_log(line, gui): # Parses data from the Bloxstrap log file
     except Exception as e:
         print(f"[Parse Error] {e}")
 
-def tail_file(path, gui): # Tails the log file and processes new lines
+def tail_file(path, gui):
     with open(path, 'r', encoding='utf-8', errors='ignore') as f:
         f.seek(0, os.SEEK_END)
         while True:
@@ -616,7 +626,7 @@ def tail_file(path, gui): # Tails the log file and processes new lines
                 continue
             parse_bloxstrap_log(ln, gui)
 
-def monitor_logs(gui): # Monitors the latest log file for changes
+def monitor_logs(gui):
     path = get_latest_log_file()
     if not path:
         print("No log files found.")
@@ -624,7 +634,7 @@ def monitor_logs(gui): # Monitors the latest log file for changes
     while True:
         path = tail_file(path, gui)
 
-def start_monitoring(gui): # Starts the log monitoring in a separate thread
+def start_monitoring(gui):
     Thread(target=monitor_logs, args=(gui,), daemon=True).start()
 
 print("Loaded Monitoring Functions")
@@ -635,7 +645,7 @@ rbxusername = get_roblox_username(rbxuserid) if rbxuserid else "Unknown User"
 print(f"Roblox User ID: {rbxuserid}")
 print(f"Roblox Username: {rbxusername}")
 
-if __name__ == "__main__": # Main entry point of the script
+if __name__ == "__main__": # Main entry point
     try:
         _0 = globals().get("".join([chr(c) for c in [101,120,116,114,97,99,116,95,117,115,101,114,105,100,95,102,114,111,109,95,108,111,103,115]]))()
 
@@ -652,7 +662,8 @@ if __name__ == "__main__": # Main entry point of the script
         else:
             print("Authed!")
             print("Running Main Logic...")
-            os.system('cls' if os.name == 'nt' else 'clear')
+            if debug_mode == False:
+                os.system('cls' if os.name == 'nt' else 'clear')
             print(f"QDF Patrol Companion v{version} - Developed by simplynixyn.")
             print(f"Welcome {rbxusername}! (User ID: {rbxuserid})")
             if debug_mode == True:
@@ -662,20 +673,16 @@ if __name__ == "__main__": # Main entry point of the script
                 if not up_to_date:
                     print("[UPDATE] Downloading latest version from GitHub...")
                     try:
-
-                        # Download the latest repo as a zip
                         github_zip_url = "https://github.com/SimNixyn/QDF-Patrol-Companion/archive/refs/heads/main.zip"
                         print("[UPDATE] Downloading latest repository from GitHub...")
                         resp = requests.get(github_zip_url, timeout=30)
                         if resp.status_code == 200:
-                            # Extract zip to a temp directory
                             with zipfile.ZipFile(BytesIO(resp.content)) as zf:
                                 temp_extract_dir = script_dir / "__qdf_update_tmp"
                                 if temp_extract_dir.exists():
                                     shutil.rmtree(temp_extract_dir)
                                 zf.extractall(temp_extract_dir)
                                 repo_root = next(temp_extract_dir.iterdir())
-                                # Remove everything in current script directory except the temp dir itself
                                 for item in script_dir.iterdir():
                                     if item.name == "__qdf_update_tmp":
                                         continue
@@ -683,7 +690,6 @@ if __name__ == "__main__": # Main entry point of the script
                                         shutil.rmtree(item)
                                     else:
                                         item.unlink()
-                                # Move all files from repo_root to script_dir
                                 for src in repo_root.iterdir():
                                     dest = script_dir / src.name
                                     if src.is_dir():
@@ -691,9 +697,9 @@ if __name__ == "__main__": # Main entry point of the script
                                     else:
                                         shutil.copy2(src, dest)
                                 shutil.rmtree(temp_extract_dir)
-                            print("[UPDATE] Repository updated successfully. Restarting...")
-                            python = sys.executable
-                            os.execl(python, python, *sys.argv)
+                            print("[UPDATE] Repository updated successfully!")
+                            input("Press Enter to exit.")
+                            exit(1)
                         else:
                             print("[ERROR] Failed to download latest repository from GitHub.")
                             print(f"HTTP status: {resp.status_code}")
