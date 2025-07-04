@@ -7,37 +7,39 @@
 
 ## 🛡️ Overview
 
-QDF Patrol Companion is a companion Python application for Roblox QDF operatives that provides:
+QDF Patrol Companion is a Python-based companion tool for Roblox QDF operatives that provides:
 
 - Real-time DMR temperature/status monitoring via F9 log scraping.
 - Advanced integrity degradation simulations.
-- Intelligent estimation when log data is delayed.
-- Meltdown audio alerts, countdowns, and visual warnings.
-- Secure access through group-based verification.
+- Intelligent estimation logic when live data is delayed.
+- Meltdown alerts with synchronized audio and GUI feedback.
+- Secure group-based access control with antitamper systems.
 
 ---
 
-## ⚠️ Notice
+## ⚠️ Notices
 
-> This script contains **antitamper mechanisms** and will **only run if you are a member of the QDF Roblox group**.  
-> Unauthorized use will trigger deterrents.
+> ❗ **Restricted Use**: This script includes antitamper mechanisms and will **only run if you are a member of the QDF Roblox group**. Unauthorized use triggers deterrent responses and exits execution.  
+>
+> ❗ **Data Disclaimer**: All data presented, including temperature readings, integrity estimations, and meltdown predictions, is derived from in-game logs and estimation algorithms. **This data is not guaranteed to be 100% accurate**. It is provided for general operational awareness only.
 
 ---
 
 ## 🧠 Features
 
-- ✅ **Log Parsing**: Reads Roblox logs via F9 system to extract RPC and DMR data.
-- 🔥 **Live Temperature Tracking**: Displays live temperature updates and uses visual color cues.
-- ⏳ **Integrity Estimation**: Calculates and predicts reactor integ degradation rate over time.
-- 🔊 **Music Integration**: Plays custom music during meltdown phases.
-- 🛑 **Antitamper & Authentication**: Prevents script use by unauthorized users.
-- 🧪 **Debug Mode**: Enables experimental features for developers.
+- ✅ **Live Log Parsing** – Extracts DMR status and temp values from Roblox F9 logs.
+- 🌡️ **Color-coded Temp Display** – Updates GUI with live temperature in Kelvin.
+- 📉 **Reactor Integrity Simulation** – Simulates degradation based on thermal thresholds.
+- 🧠 **Estimation Engine** – Predicts state when logs lag or data is missing.
+- 🎵 **Meltdown Music** – Custom music triggers during critical phases.
+- 🛡️ **Tamper Protection** – Script only executes if group membership is verified.
+- 🧪 **Debug Mode** – Enables verbose output and experimental utilities.
 
 ---
 
-## 🖥️ Requirements
+## 📦 Requirements
 
-Ensure the following Python packages are installed (automatically handled by the script):
+These packages are installed automatically on first run:
 
 - `tkinter`
 - `pygame`
@@ -48,10 +50,12 @@ Ensure the following Python packages are installed (automatically handled by the
 - `playsound`
 - `win10toast`
 
-**Note:** `requirements.txt` is parsed and installed automatically when you run the script.
+> The script parses your `requirements.txt` and installs missing dependencies.
 
 ---
 
 ## 🚀 How to Run
 
-Clone or download the repository, and run QDF Patrol Companion.py
+1. Clone this repository or download the ZIP.
+2. Run `QDF Patrol Companion.py` using Python 3.10+.
+3. The script will verify your QDF membership and then launch the rest of the system.
