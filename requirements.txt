@@ -4,3 +4,4 @@ pyaudio
 pygame
 numpy
 pydub
+pygetwindow
