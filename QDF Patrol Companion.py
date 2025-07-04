@@ -6,37 +6,13 @@
 #  ╚══▀▀═╝ ╚═════╝ ╚═╝         ╚═╝     ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚══════╝     ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝     ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝
 # QDF Patrol Companion
 # Developed by simplynixyn
-version = "0.4 Alpha"
+version = "0.5 Alpha"
 # This script is designed to monitor DMR temperature and status from Roblox logs.
 # It will notify the user of temperature changes and status updates.
 # It also includes a debug mode for additional experimental features, and additional logging.
 # =====================================
 # NOTICE!!! This script uses antitamper techniques to prevent unauthorized access and use.
 # Thus meaning, if you are not within the QDF Roblox group, you will not be able to run this script.
-
-def ensure_requirements_installed():
-    import subprocess
-    import sys
-    from pathlib import Path
-    import importlib.metadata as importlib_metadata
-
-    req_path = Path(__file__).parent / "requirements.txt"
-    if req_path.exists():
-        with open(req_path) as f:
-            required = [line.strip() for line in f if line.strip() and not line.startswith("#")]
-        installed = {dist.metadata['Name'].lower() for dist in importlib_metadata.distributions()}
-        to_install = []
-        for req in required:
-            pkg_name = req.split("==")[0].lower() if "==" in req else req.lower()
-            if pkg_name not in installed:
-                to_install.append(req)
-        if to_install:
-            try:
-                subprocess.check_call([sys.executable, "-m", "pip", "install", *to_install])
-            except Exception as e:
-                print(f"[WARN] Failed to install requirements: {e}")
-
-ensure_requirements_installed()
 
 print("Starting QDF Patrol Companion...")
 print("Loading Imports...")
@@ -46,6 +22,8 @@ try:
     import time
     import glob
     import json
+    import zipfile
+    import sys
     import re
     import tkinter as tk
     from tkinter import PhotoImage
@@ -70,7 +48,6 @@ try:
     import random
     import random, time, threading
     import sys
-    import zipfile
     import shutil
     from io import BytesIO
     import pygetwindow as gw
