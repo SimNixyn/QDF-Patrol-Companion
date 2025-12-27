@@ -47,11 +47,3 @@ These packages are installed automatically on first run:
 - `win10toast`
 
 > The script parses your `requirements.txt` and installs missing dependencies.
-
----
-
-## 🚀 How to Run
-
-1. Clone this repository or download the ZIP.
-2. Run `QDF Patrol Companion.py` using Python 3.10+.
-3. The script will verify your QDF membership and then launch the rest of the system.
