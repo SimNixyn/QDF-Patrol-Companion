@@ -1,7 +1,0 @@
-win10toast
-requests
-pyaudio
-pygame
-numpy
-pydub
-pygetwindow
