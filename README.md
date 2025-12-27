@@ -11,7 +11,7 @@ QDF Patrol Companion is a Python-based companion tool for Roblox QDF operatives 
 
 - Real-time DMR temperature/status monitoring via F9 log scraping.
 - Advanced integrity degradation simulations.
-- Intelligent estimation logic when live data is delayed.
+- Intelligent estimation logic.
 
 ---
 
