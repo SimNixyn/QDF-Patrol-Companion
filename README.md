@@ -20,6 +20,8 @@ QDF Patrol Companion is a Python-based companion tool for Roblox QDF operatives 
 > ❗ **Restricted Use**: This script includes antitamper mechanisms and will **only run if you are a member of the QDF Roblox group**. Unauthorized use triggers deterrent responses and exits execution.  
 >
 > ❗ **Data Disclaimer**: All data presented, including temperature readings, integrity estimations, and meltdown predictions, is derived from in-game logs and estimation algorithms. **This data is not guaranteed to be 100% accurate**. It is provided for general operational awareness only.
+>
+> ❗ **SOON TO BE PATCHED!**: This system's core functionality runs on QSERF's F9 Logs telemetry, and the devs has offically stated that they will be bringing it to end-of-life (likely within the next few QSERF combat patches) due to this tool utilzing these telemetry logs for purely unintended reasons that may give the QDF Operator in question a very very slight advantage. Since this tool has gotten moderation approval for use, it is not considered as a "cheat" or "exploit" that can be moderateable for, therefor why they're removing telemetry instead of attempting to outlaw this tool. So use this tool while you can and enjoy being able to see the DMR status anywhere at any time.  
 
 ---
 
@@ -37,13 +39,4 @@ QDF Patrol Companion is a Python-based companion tool for Roblox QDF operatives 
 
 These packages are installed automatically on first run:
 
-- `tkinter`
-- `pygame`
-- `pyaudio`
-- `pydub`
-- `numpy`
-- `requests`
-- `playsound`
-- `win10toast`
-
-> The script parses your `requirements.txt` and installs missing dependencies.
+- Windows 7, 8, 10, 11+.
