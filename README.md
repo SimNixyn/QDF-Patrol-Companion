@@ -1,6 +1,6 @@
 # QDF Patrol Companion
 
-**Version**: `v0.4 alpha`  
+**Version**: `v0.5 alpha`  
 **Author**: [simplynixyn](https://github.com/SimNixyn)
 
 ---
